@@ -1,0 +1,98 @@
+using System;
+using System.Collections.Generic;
+
+class Vehicle
+{
+    public string LicensePlate { get; set; }
+    public DateTime EntryTime { get; set; }
+}
+
+class ParkingLot
+{
+    private List<Vehicle> vehicles = new List<Vehicle>();
+    private decimal ratePerHour = 5.0m;
+
+    public void AddVehicle(string licensePlate)
+    {
+        Vehicle vehicle = new Vehicle
+        {
+            LicensePlate = licensePlate,
+            EntryTime = DateTime.Now
+        };
+        vehicles.Add(vehicle);
+        Console.WriteLine($"Veículo {licensePlate} estacionado com sucesso.");
+    }
+
+    public void RemoveVehicle(string licensePlate)
+    {
+        Vehicle vehicle = vehicles.Find(v => v.LicensePlate == licensePlate);
+        if (vehicle != null)
+        {
+            vehicles.Remove(vehicle);
+            decimal charge = CalculateCharge(vehicle);
+            Console.WriteLine($"Veículo {licensePlate} removido. Taxa: R$ {charge}");
+        }
+        else
+        {
+            Console.WriteLine($"Veículo {licensePlate} não encontrado no estacionamento.");
+        }
+    }
+
+    public void ListVehicles()
+    {
+        Console.WriteLine("Veículos estacionados:");
+        foreach (var vehicle in vehicles)
+        {
+            Console.WriteLine($"Placa: {vehicle.LicensePlate}, Entrada: {vehicle.EntryTime}");
+        }
+    }
+
+    private decimal CalculateCharge(Vehicle vehicle)
+    {
+        DateTime currentTime = DateTime.Now;
+        TimeSpan stayDuration = currentTime - vehicle.EntryTime;
+        int hours = (int)stayDuration.TotalHours;
+        return ratePerHour * hours;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        ParkingLot parkingLot = new ParkingLot();
+
+        while (true)
+        {
+            Console.WriteLine("Escolha uma opção:");
+            Console.WriteLine("1. Adicionar veículo");
+            Console.WriteLine("2. Remover veículo");
+            Console.WriteLine("3. Listar veículos");
+            Console.WriteLine("4. Sair");
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    Console.Write("Digite a placa do veículo: ");
+                    string licensePlate = Console.ReadLine();
+                    parkingLot.AddVehicle(licensePlate);
+                    break;
+                case "2":
+                    Console.Write("Digite a placa do veículo a ser removido: ");
+                    licensePlate = Console.ReadLine();
+                    parkingLot.RemoveVehicle(licensePlate);
+                    break;
+                case "3":
+                    parkingLot.ListVehicles();
+                    break;
+                case "4":
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Opção inválida. Tente novamente.");
+                    break;
+            }
+        }
+    }
+}
